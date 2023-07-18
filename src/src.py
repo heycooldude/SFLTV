@@ -80,8 +80,9 @@ if __name__ == '__main__':
     # Ingest events
     ingest_events(events, D)
 
+    x =10
     # Calculate and print top x customers with highest Simple LTV
-    top_customers = TopXSimpleLTVCustomers(10, D)
+    top_customers = TopXSimpleLTVCustomers(x, D)
 
     with open('output.txt', 'w') as outfile:
         for customerID, ltv in top_customers:
