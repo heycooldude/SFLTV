@@ -51,26 +51,6 @@ class LTVCalculator:
         elif event_type == 'ORDER':
             customer.total_spending += float(event['total_amount'].split(" ")[0])
 
-    def calculate_avg_weekly_expenditure(self, customer_id):
-        """
-            Calculates the average weekly expenditure of the customer.
-
-            Args:
-                customer_id (str): The customer ID.
-
-            Returns:
-                float: The average weekly expenditure.
-        """
-        customer = self.customers[customer_id]
-        avg_expenditure_per_visit = 0.0
-        visits = customer.visits
-        if visits > 0:
-            avg_expenditure_per_visit = customer.total_spending / visits
-        else:
-            avg_expenditure_per_visit = 0.0
-        weeks = rrule.rrule(rrule.WEEKLY, dtstart=customer.event_entry, until=customer.event_exit).count()
-        avg_weekly_visit = customer.visits / weeks
-        return avg_expenditure_per_visit * avg_weekly_visit
 
     def calculate_top_x_ltv_customers(self, x):
         """
@@ -85,7 +65,17 @@ class LTVCalculator:
         top_customers = []
         for customer_id in self.customers:
             # Calculate the Simple LTV.
-            ltv = self.calculate_avg_weekly_expenditure(customer_id) * 52 * 10
+            customer = self.customers[customer_id]
+            avg_expenditure_per_visit = 0.0
+            visits = customer.visits
+            if visits > 0:
+                avg_expenditure_per_visit = customer.total_spending / visits
+            else:
+                avg_expenditure_per_visit = 0.0
+            weeks = rrule.rrule(rrule.WEEKLY, dtstart=customer.event_entry, until=customer.event_exit).count()
+            avg_weekly_visit = customer.visits / weeks
+            avg_weekly_expenditure =  avg_expenditure_per_visit * avg_weekly_visit
+            ltv = avg_weekly_expenditure * 52 * 10
 
             # Use a min-heap to maintain the top x customers.
             if len(top_customers) < x:
